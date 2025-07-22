@@ -116,7 +116,6 @@
     
     
 <script>
-// Предполагается, что hitSound и bgSound уже определены в основном скрипте игры
 const mainMenu = document.getElementById('main-menu');
 const settingsMenu = document.getElementById('settings-menu');
 const licenseMenu = document.getElementById('license-menu');
@@ -127,8 +126,7 @@ const bgVolumeValue = document.getElementById('bg-volume-value');
 
 function startGame() {
   mainMenu.style.display = 'none'; // Скрываем меню
-  bgSound.play().catch(e => console.log('Background sound error:', e)); // Запускаем фоновую музыку
-  // Предполагается, что основной код игры уже запускается (например, gameLoop или аналог)
+  bgSound.play().catch(e => console.log('Background sound error:', e)); 
 }
 
 function showSettings() {
@@ -142,7 +140,7 @@ function showLicense() {
 }
 
 function goToSupport() {
-  window.open('https://boosty.to/cub8t/donate', '_blank'); // Placeholder для Boosty
+  window.open('https://boosty.to/cub8t/donate', '_blank');
 }
 
 function backToMainMenu() {
