@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>number game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: black;
+            height: 100vh;
+            width: 100vw;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .number {
+            position: absolute;
+            color: white;
+            font-family: Arial, sans-serif;
+            pointer-events: none;
+            text-align: center;
+        }
+        
+  /* Стили для главного меню */
+  #main-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .menu-button {
+    background: none;
+    border: 2px solid white;
+    color: white;
+    font-size: 24px;
+    padding: 10px 20px;
+    margin: 10px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 200px;
+    text-align: center;
+  }
+
+  #settings-menu, #license-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 20px;
+    z-index: 1001;
+  }
+
+  #settings-menu input {
+    width: 80%;
+    margin: 10px 0;
+  }
+
+  #license-menu p {
+    text-align: center;
+    margin: 20px;
+  }
+
+  .back-button {
+    background: none;
+    border: 2px solid white;
+    color: white;
+    font-size: 20px;
+    padding: 8px 16px;
+    margin-top: 20px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+    </style>
+</head>
+<body> 
+    
+
+    <div id="main-menu">
+        <button class="menu-button" onclick="startGame()">Play</button>
+        <button class="menu-button" onclick="showSettings()">Settings</button>
+        <button class="menu-button" onclick="showLicense()">License</button>
+        <button class="menu-button" onclick="goToSupport()">Support</button>
+      </div>
+      
+      <div id="settings-menu">
+        <label for="hit-volume">Hit Sound Volume: <span id="hit-volume-value">100</span>%</label>
+        <input type="range" id="hit-volume" min="0" max="100" value="100">
+        <label for="bg-volume">Background Music Volume: <span id="bg-volume-value">100</span>%</label>
+        <input type="range" id="bg-volume" min="0" max="100" value="100">
+        <button class="back-button" onclick="backToMainMenu()">Back</button>
+      </div>
+      
+      <div id="license-menu">
+        <p>All rights reserved. This game is created and owned by cub8t aka NORTHERN VOID. https://youtube.com/@cub8t https://youtube.com/@NORTHERNVOID1337</p>
+        <button class="back-button" onclick="backToMainMenu()">Back</button>
+      </div>
+    
+    
+<script>
+// Предполагается, что hitSound и bgSound уже определены в основном скрипте игры
+const mainMenu = document.getElementById('main-menu');
+const settingsMenu = document.getElementById('settings-menu');
+const licenseMenu = document.getElementById('license-menu');
+const hitVolumeSlider = document.getElementById('hit-volume');
+const bgVolumeSlider = document.getElementById('bg-volume');
+const hitVolumeValue = document.getElementById('hit-volume-value');
+const bgVolumeValue = document.getElementById('bg-volume-value');
+
+function startGame() {
+  mainMenu.style.display = 'none'; // Скрываем меню
+  bgSound.play().catch(e => console.log('Background sound error:', e)); // Запускаем фоновую музыку
+  // Предполагается, что основной код игры уже запускается (например, gameLoop или аналог)
+}
+
+function showSettings() {
+  mainMenu.style.display = 'none';
+  settingsMenu.style.display = 'flex';
+}
+
+function showLicense() {
+  mainMenu.style.display = 'none';
+  licenseMenu.style.display = 'flex';
+}
+
+function goToSupport() {
+  window.open('https://boosty.to/cub8t/donate', '_blank'); // Placeholder для Boosty
+}
+
+function backToMainMenu() {
+  settingsMenu.style.display = 'none';
+  licenseMenu.style.display = 'none';
+  mainMenu.style.display = 'flex';
+}
+
+
+hitVolumeSlider.addEventListener('input', () => {
+  hitSound.volume = hitVolumeSlider.value / 100;
+  hitVolumeValue.textContent = hitVolumeSlider.value;
+
+  hitSound2.volume = hitVolumeSlider.value / 100;
+  hitVolumeValue.textContent = hitVolumeSlider2.value;
+
+  hitSound3.volume = hitVolumeSlider.value / 100;
+  hitVolumeValue.textContent = hitVolumeSlider.value;
+  
+  hitSound4.volume = hitVolumeSlider.value / 100;
+  hitVolumeValue.textContent = hitVolumeSlider.value;
+});
+
+bgVolumeSlider.addEventListener('input', () => {
+  bgSound.volume = bgVolumeSlider.value / 100;
+  bgVolumeValue.textContent = bgVolumeSlider.value;
+});
+
+
+const hitSound = new Audio('hit1.mp3'); 
+const hitSound2 = new Audio('hit2.mp3');
+const hitSound3 = new Audio('hit3.mp3');
+const hitSound4 = new Audio('hit4.mp3');
+const numbers = [];
+const bgSound = new Audio('void2.mp3');
+bgSound.volume = 0.4
+
+
+let buff = 0;
+const sounds = [hitSound, hitSound2, hitSound3, hitSound4];
+//const prime = ['1', '3', '5', '7', '11', '13', '17', '19', '23']
+const speed = 80;
+const probabilities = {
+    '1': 0.9,
+    '3': 0.09,
+    '5': 0.009,
+    '7': 0.0009,
+    '11': 0.00009,
+    '13': 0.000009,
+    '17': 0.0000009,
+    '19': 0.00000009,
+    '23': 0.000000009,
+}
+function getRandomWithProbability(probabilities) {
+  const random = Math.random();
+  let cumulativeProbability = 0;
+
+  for (const key in probabilities) {
+    cumulativeProbability += probabilities[key];
+    if (random <= cumulativeProbability) {
+      return key;
+    }
+  }
+}
+function getRandomElement(arr) {
+  if (!Array.isArray(arr) || arr.length === 0) {
+    return undefined; 
+  }
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
+}
+
+document.addEventListener('click', (e) => {
+    bgSound.loop = true;
+    bgSound.play().catch(e => console.log('Background sound error:', e)); 
+    const x = e.clientX, y = e.clientY;
+    if (numbers.some(n => {
+        const r = n.element.getBoundingClientRect();
+        return Math.abs(r.left - x) < 20 && Math.abs(r.top - y) < 20;
+    })) return;
+
+    const number = document.createElement('div');
+    number.className = 'number';
+    if (number.length<2) number.textContent = '1'
+    else number.textContent = getRandomWithProbability(probabilities)
+
+
+    number.style.cssText = `position:absolute;left:${x}px;top:${y}px;font-size:${10 + Math.random() * 16}px`;
+
+    const angle = Math.random() * 2 * Math.PI;
+    numbers.push({ element: number, velocity: { x: Math.cos(angle) * speed, y: Math.sin(angle) * speed }, value: Number(number.textContent) });
+    document.body.appendChild(number);
+});
+
+function animate() {
+    const dt = 1 / 60, w = window.innerWidth, h = window.innerHeight;
+    
+    for (const n of numbers) {
+        const r = n.element.getBoundingClientRect();
+        let x = parseFloat(n.element.style.left), y = parseFloat(n.element.style.top);
+
+        x += n.velocity.x * dt;
+        y += n.velocity.y * dt;
+
+        if (x < 0 || x + r.width > w) n.velocity.x *= -1, x = Math.max(0, Math.min(x, w - r.width));
+        if (y < 0 || y + r.height > h) n.velocity.y *= -1, y = Math.max(0, Math.min(y, h - r.height));
+
+        n.element.style.left = `${x}px`;
+        n.element.style.top = `${y}px`;
+    }
+
+    for (let i = numbers.length - 1; i >= 0; i--) {
+        const n = numbers[i], r = n.element.getBoundingClientRect(), x = parseFloat(n.element.style.left), y = parseFloat(n.element.style.top);
+        for (let j = i - 1; j >= 0; j--) {
+            const o = numbers[j], or = o.element.getBoundingClientRect(), ox = parseFloat(o.element.style.left), oy = parseFloat(o.element.style.top);
+            const dx = x + r.width / 2 - (ox + or.width / 2), dy = y + r.height / 2 - (oy + or.height / 2);
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < (r.width + or.width) / 2 && dist > 0) {  
+                buff = getRandomElement(sounds)
+                buff.play().catch(e => console.log('Sound error:', e)); 
+
+                if (n.value === o.value) {
+                    n.value+=o.value;
+                    n.element.textContent = n.value;
+                    n.element.style.fontSize = `${Math.min(parseFloat(n.element.style.fontSize) + 2, 30)}px`;
+                    n.element.style.left = `${(x + ox) / 2}px`;
+                    n.element.style.top = `${(y + oy) / 2}px`;
+                    n.velocity.x = (n.velocity.x + o.velocity.x) / 2;
+                    n.velocity.y = (n.velocity.y + o.velocity.y) / 2;
+                    document.body.removeChild(o.element);
+                    numbers.splice(j, 1);
+                } else {
+                    const angle = Math.atan2(dy, dx);
+                    const overlap = (r.width + or.width) / 2 - dist;
+                    const v1 = Math.sqrt(n.velocity.x ** 2 + n.velocity.y ** 2);
+                    const v2 = Math.sqrt(o.velocity.x ** 2 + o.velocity.y ** 2);
+
+                    n.element.style.left = `${x + Math.cos(angle) * overlap / 2}px`;
+                    n.element.style.top = `${y + Math.sin(angle) * overlap / 2}px`;
+                    o.element.style.left = `${ox - Math.cos(angle) * overlap / 2}px`;
+                    o.element.style.top = `${oy - Math.sin(angle) * overlap / 2}px`;
+
+                    n.velocity.x = Math.cos(angle + Math.PI / 2) * v2;
+                    n.velocity.y = Math.sin(angle + Math.PI / 2) * v2;
+                    o.velocity.x = Math.cos(angle - Math.PI / 2) * v1;
+                    o.velocity.y = Math.sin(angle - Math.PI / 2) * v1;
+                }
+            }
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
