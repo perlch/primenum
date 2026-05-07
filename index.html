@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>primenum</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #fff;
+        }
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        .container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card {
+            background-color: rgba(0, 0, 0, 0.85);
+            border: 2px solid #fff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.2);
+            border-radius: 40px;
+            padding: 40px 30px;
+            max-width: 320px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+        p {
+            font-size: 1rem;
+            line-height: 1.4;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 10px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        .footer-link {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+        .footer-link a {
+            color: #fff;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div class="container">
+    <div class="card">
+        <h1>primenum</h1>
+        <p>primenum is a game about number's collision.</p>
+        <div class="links">
+            <a href="https://perlch.github.io/primenum/game.html">try here</a>
+            <a href="https://github.com/perlch/app.apk/">download apk</a>
+            <a href="https://perlch.github.io/">my other projects</a>
+        </div>
+        <div class="footer-link">
+            made by <a href="https://github.com/perlch/">perlch</a>
+        </div>
+    </div>
+</div>
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let numbers = [];
+    const count = 50;
+    function init() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        numbers = [];
+        for (let i = 0; i < count; i++) {
+            numbers.push(new NumberParticle());
+        }
+    }
+    class NumberParticle {
+        constructor() {
+            this.radius = 15;
+            this.x = Math.random() * (width - this.radius * 2) + this.radius;
+            this.y = Math.random() * (height - this.radius * 2) + this.radius;
+            this.vx = (Math.random() - 0.5) * 2;
+            this.vy = (Math.random() - 0.5) * 2;
+            this.val = Math.floor(Math.random() * 10);
+            this.fontSize = Math.floor(Math.random() * 20) + 20;
+        }
+        draw() {
+            ctx.font = `${this.fontSize}px monospace`;
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(this.val, this.x, this.y);
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x - this.radius < 0 || this.x + this.radius > width) this.vx *= -1;
+            if (this.y - this.radius < 0 || this.y + this.radius > height) this.vy *= -1;
+            this.draw();
+        }
+    }
+    function solveCollision(p1, p2) {
+        const dx = p1.x - p2.x;
+        const dy = p1.y - p2.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < p1.radius + p2.radius) {
+            const angle = Math.atan2(dy, dx);
+            const sin = Math.sin(angle);
+            const cos = Math.cos(angle);
+            const vx1 = p1.vx * cos + p1.vy * sin;
+            const vy1 = p1.vy * cos - p1.vx * sin;
+            const vx2 = p2.vx * cos + p2.vy * sin;
+            const vy2 = p2.vy * cos - p2.vx * sin;
+            p1.vx = vx2 * cos - vy1 * sin;
+            p1.vy = vy1 * cos + vx2 * sin;
+            p2.vx = vx1 * cos - vy2 * sin;
+            p2.vy = vy2 * cos + vx1 * sin;
+            const overlap = (p1.radius + p2.radius - distance) / 2;
+            p1.x += overlap * cos;
+            p1.y += overlap * sin;
+            p2.x -= overlap * cos;
+            p2.y -= overlap * sin;
+        }
+    }
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < numbers.length; i++) {
+            for (let j = i + 1; j < numbers.length; j++) {
+                solveCollision(numbers[i], numbers[j]);
+            }
+            numbers[i].update();
+        }
+        requestAnimationFrame(animate);
+    }
+    window.addEventListener('resize', init);
+    init();
+    animate();
+</script>
+</body>
+</html>
